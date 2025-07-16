@@ -1,0 +1,30 @@
+﻿@model IList<ProdutoModel>;
+
+<h1>Meus produtos</h1>
+<p class="toolbar">
+	<a asp-controller="Produto" asp-action="Create" class="create btn btn-dark">Novo produto</a>
+</p>
+
+@if (!string.IsNullOrEmpty(TempData["SuccessMessage"] as string))
+{
+	<div class="alert alert-info">@TempData["SuccessMessage"]</div>
+}
+
+<table class="table table-striped" border="1" cellspacing="0" cellpadding="0">
+	<thead>
+		<tr>
+			<th data-field="id">Id</th>
+			<th data-field="name">Nome</th>
+			<th data-field="tipo">Categoria</th>
+			<th data-field="disponivel">Disponível</th>
+			<th data-field="dataexpiracao">Expiração</th>
+			<th class="actions" width="220">Ações</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<partial name="_ProdutoItem" model="@item" />
+		}
+	</tbody>
+</table>
