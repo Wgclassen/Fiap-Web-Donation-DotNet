@@ -1,5 +1,6 @@
 ﻿using Fiap.Web.Donation5.Data;
 using Fiap.Web.Donation5.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Fiap.Web.Donation5.Repository
 {
@@ -16,12 +17,61 @@ namespace Fiap.Web.Donation5.Repository
         public ProdutoModel FindById(int id)
         {
 
-            return _dataContext.Produtos.Find(id);
+            return _dataContext.Produtos.AsNoTracking().SingleOrDefault(p => p.ProdutoId == id);
         }
 
-        public IList<ProdutoModel> FindAll()
+        public List<ProdutoModel> FindAll()
         {
-            return _dataContext.Produtos.ToList() ?? new List<ProdutoModel>();
+            var produtos = _dataContext.Produtos.AsNoTracking().ToList();
+
+            return produtos ?? new List<ProdutoModel>();
+        }
+
+        public List<ProdutoModel> FindAllWithCategoriaAndUsuario()
+        {
+            var produtos = _dataContext.Produtos.AsNoTracking()
+                                .Include(c => c.Categoria) // INNER JOIN                                   
+                                .Include(u => u.Usuarios)   // INNER JOIN 
+                                .ToList();
+
+            return produtos ?? new List<ProdutoModel>();
+        }
+
+        public List<ProdutoModel> FindAllAvailableWithCategoriaAndUsuario()
+        {
+            var produtos = _dataContext.Produtos.AsNoTracking()
+                                .Where(p=> p.Disponivel == true && p.DataExpiracao >= DateTime.UtcNow)
+                                .Include(c => c.Categoria) // INNER JOIN                                   
+                                .Include(u => u.Usuarios)   // INNER JOIN 
+                                .ToList();
+
+            return produtos ?? new List<ProdutoModel>();
+        }
+
+        public List<ProdutoModel> FindAllAvailableWithCategoriaAndUsuarioByUserId(int userId)
+        {
+            var produtos = _dataContext.Produtos.AsNoTracking()
+                                .Where(p => p.Disponivel == true &&
+                                            p.DataExpiracao >= DateTime.UtcNow &&
+                                            p.UsuarioId == userId)
+                                .Include(c => c.Categoria) // INNER JOIN                                   
+                                .Include(u => u.Usuarios)   // INNER JOIN 
+                                .ToList();
+
+            return produtos ?? new List<ProdutoModel>();
+        }
+
+        public List<ProdutoModel> FindAllAvailableForChange(int userId)
+        {
+            var produtos = _dataContext.Produtos.AsNoTracking()
+                                .Where(p => p.Disponivel == true &&
+                                            p.DataExpiracao >= DateTime.UtcNow &&
+                                            p.UsuarioId != userId)
+                                .Include(c => c.Categoria) // INNER JOIN                                   
+                                .Include(u => u.Usuarios)   // INNER JOIN 
+                                .ToList();
+
+            return produtos ?? new List<ProdutoModel>();
         }
 
         public int Insert(ProdutoModel produtoModel)
@@ -29,7 +79,7 @@ namespace Fiap.Web.Donation5.Repository
             _dataContext.Produtos.Add(produtoModel);
             _dataContext.SaveChanges();
 
-            return produtoModel.CategoriaId;
+            return produtoModel.ProdutoId;
         }
 
         public void Update(ProdutoModel produtoModel)
