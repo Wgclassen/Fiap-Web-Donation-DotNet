@@ -37,6 +37,17 @@ namespace Fiap.Web.Donation5.Repository
             return produtos ?? new List<ProdutoModel>();
         }
 
+        public List<ProdutoModel> FindAllWithCategoriaAndUsuarioByName(string nomeParcial)
+        {
+            var produtos = _dataContext.Produtos.AsNoTracking()
+                                .Where(p => p.NomeProduto.ToLower().Contains(nomeParcial.ToLower()))
+                                .Include(c => c.Categoria) // INNER JOIN                                   
+                                .Include(u => u.Usuarios)   // INNER JOIN 
+                                .ToList();
+
+            return produtos ?? new List<ProdutoModel>();
+        }
+
         public List<ProdutoModel> FindAllAvailableWithCategoriaAndUsuario()
         {
             var produtos = _dataContext.Produtos.AsNoTracking()
