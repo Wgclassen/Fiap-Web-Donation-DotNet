@@ -1,3 +1,15 @@
-﻿@{
+﻿@using System.Text.Json;
+
+@{
     Layout = "_Layout";
+
+    UsuarioModel? usuarioModel = null;
+
+    var usuarioJson = Context.Session.GetString("usuarioLogado");
+    if (!string.IsNullOrEmpty(usuarioJson))
+    {
+        var usuario = JsonSerializer.Deserialize<UsuarioModel>(usuarioJson);
+        ViewBag.UsuarioLogado = usuario;
+    }
+
 }
