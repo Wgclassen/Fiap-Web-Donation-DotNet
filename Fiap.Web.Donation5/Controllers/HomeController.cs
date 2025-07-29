@@ -1,21 +1,36 @@
 using System.Diagnostics;
+using Fiap.Web.Donation5.Data;
 using Fiap.Web.Donation5.Models;
+using Fiap.Web.Donation5.Repository;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Fiap.Web.Donation5.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        private readonly ProdutoRepository _produtoRepository;
+
+        public HomeController(DataContext dataContext, ILogger<HomeController> logger)
         {
             _logger = logger;
+            _produtoRepository = new ProdutoRepository(dataContext);
         }
 
         public IActionResult Index()
         {
-            return View();
+            var produtos = new List<ProdutoModel>();
+
+            if (Autenticado)
+            {
+                produtos = _produtoRepository.FindAllAvailableForChange(UsuarioLogado.UsuarioId);
+            } else
+            {
+                produtos = _produtoRepository.FindAllAvailableWithCategoriaAndUsuario();
+            }
+
+                return View(produtos);
         }
 
         public IActionResult Privacy()

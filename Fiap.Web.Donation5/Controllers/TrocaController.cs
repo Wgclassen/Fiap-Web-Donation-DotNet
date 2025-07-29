@@ -2,10 +2,11 @@
 using Fiap.Web.Donation5.Models;
 using Fiap.Web.Donation5.Repository;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Fiap.Web.Donation5.Controllers
 {
-    public class TrocaController : Controller
+    public class TrocaController : BaseController
     {
         private readonly TrocaRepository _trocaRepository;
         private readonly ProdutoRepository _produtoRepository;
@@ -19,9 +20,16 @@ namespace Fiap.Web.Donation5.Controllers
 
 
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index(int id)
         {
-            return View();
+            var produtoEscolhido = _produtoRepository.FindById(id);
+            var trocaModel = new TrocaModel();
+            trocaModel.ProdutoEscolhido = produtoEscolhido;
+
+            var meusProdutos = _produtoRepository.FindAllAvailableWithCategoriaAndUsuarioByUserId(UsuarioLogado.UsuarioId);
+            ViewBag.MeusProdutos = new SelectList(meusProdutos, "ProdutoId", "NomeProduto");
+
+            return View(trocaModel);
         }
 
         [HttpPost]
