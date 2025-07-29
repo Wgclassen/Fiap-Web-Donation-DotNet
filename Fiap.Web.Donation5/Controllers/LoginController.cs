@@ -1,4 +1,5 @@
-﻿using Fiap.Web.Donation5.Data;
+﻿using Fiap.Web.Donation5.Controllers.Filters;
+using Fiap.Web.Donation5.Data;
 using Fiap.Web.Donation5.Models;
 using Fiap.Web.Donation5.Repository;
 using Microsoft.AspNetCore.Mvc;
@@ -57,8 +58,9 @@ namespace Fiap.Web.Donation5.Controllers
                 return View(usuarioModel);
             }
         }
-
+        
         [HttpGet]
+        [Autenticado]
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();

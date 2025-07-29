@@ -1,4 +1,5 @@
-﻿using Fiap.Web.Donation5.Data;
+﻿using Fiap.Web.Donation5.Controllers.Filters;
+using Fiap.Web.Donation5.Data;
 using Fiap.Web.Donation5.Models;
 using Fiap.Web.Donation5.Repository;
 using Microsoft.AspNetCore.Mvc;
@@ -6,11 +7,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Fiap.Web.Donation5.Controllers
 {
-    public class ProdutoController : Controller
+    [Autenticado]
+    public class ProdutoController : BaseController
     {
-
-        private readonly int UserId = 1;
-
         private readonly ProdutoRepository _produtoRepository;
         private readonly CategoriaRepository _categoriaRepository;
 
@@ -47,7 +46,7 @@ namespace Fiap.Web.Donation5.Controllers
         {
             if (string.IsNullOrEmpty(produtoModel.Descricao))
             {
-                produtoModel.UsuarioId = UserId;
+                produtoModel.UsuarioId = UsuarioLogado.UsuarioId;
 
                 ViewBag.ErrorMessage = "A descrição é requerida";
                 return View(produtoModel);
@@ -55,7 +54,7 @@ namespace Fiap.Web.Donation5.Controllers
             {
                 _produtoRepository.Update(produtoModel);
 
-                produtoModel.UsuarioId = UserId;
+                produtoModel.UsuarioId = UsuarioLogado.UsuarioId;
                 _produtoRepository.Update(produtoModel);
                 TempData["SuccessMessage"] = $"O produto {produtoModel.NomeProduto} foi alterado com sucesso";
                 return RedirectToAction(nameof(Index));
@@ -81,7 +80,7 @@ namespace Fiap.Web.Donation5.Controllers
         public IActionResult Create(ProdutoModel produtoModel)
         {
 
-            produtoModel.UsuarioId = UserId;
+            produtoModel.UsuarioId = UsuarioLogado.UsuarioId;
 
             if (ModelState.IsValid)
             {
